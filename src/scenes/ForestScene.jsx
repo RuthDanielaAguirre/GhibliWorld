@@ -1,52 +1,119 @@
-import MistLayer from "../layerComponents/visuals/MistLayer";
+import useGhibliFilms from '../hooks/useGhibliFilms'
+import FilmOrb from '../layerComponents/visuals/FilmOrb'
+import { motion } from 'framer-motion'
 
-export default function ForestScene({ films, loading, onFilmSelect }) {
+const FEATURED_FILMS = [
+  'Spirited Away',
+  'My Neighbor Totoro',
+  'Howl\'s Moving Castle',
+  'Princess Mononoke',
+  'Castle in the Sky',
+  'Kiki\'s Delivery Service'
+]
+
+const POSITIONS = [
+  { left: '20%', top: '25%', delay: 0 },
+  { left: '45%', top: '20%', delay: 0.15 },
+  { left: '70%', top: '30%', delay: 0.3 },
+  { left: '30%', top: '55%', delay: 0.45 },
+  { left: '60%', top: '60%', delay: 0.6 },
+  { left: '50%', top: '80%', delay: 0.75 }
+]
+
+export default function ForestScene({ films: propsFilms, loading: propsLoading, onFilmSelect }) {
+  const hookData = useGhibliFilms()
+  
+  const films = propsFilms || hookData.films
+  const loading = propsLoading !== undefined ? propsLoading : hookData.loading
+  
   if (loading) {
     return (
-      <div className="relative h-screen flex items-center justify-center bg-gradient-to-b from-green-800 to-green-950">
-        <MistLayer theme="forest" layers={3} baseOpacity={0.3} direction="diagonal" />
-        <p className="text-green-200 text-xl animate-pulse">
-          Cargando películas...
-        </p>
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        backgroundColor: '#1a4d2e'
+      }}>
+        <motion.p
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          style={{ color: 'white', fontSize: '20px' }}
+        >
+          Cargando el bosque mágico...
+        </motion.p>
       </div>
-    );
+    )
   }
 
+  const featuredFilms = []
+  
+  for(let i = 0; i < films.length; i++) {
+    const film = films[i]
+    
+    if(FEATURED_FILMS.includes(film.title)) {
+      featuredFilms.push(film)
+    }
+  }
+  
   return (
-    <div
-      className="relative min-h-screen bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: "url('/forest.png')" }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+      style={{ 
+        position: 'relative', 
+        width: '100%', 
+        height: '100vh', 
+        overflow: 'hidden' 
+      }}
     >
-      {/* 🌫️ niebla del bosque */}
-      <MistLayer theme="forest" layers={4} baseOpacity={0.35} direction="diagonal" />
-
-      <div className="relative z-10 text-center pt-16 mb-8">
-        <h1 className="text-4xl text-white font-light mb-2 drop-shadow-lg">
-          Bosque con Calcifer
-        </h1>
-        <p className="text-green-200">Películas: {films.length}</p>
-      </div>
-
-      <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto px-6 pb-20">
-        {films.map((film) => (
-          <div
+      
+      {/* Fondo de bosque */}
+      <img 
+        src="/forest.png" 
+        alt="Bosque" 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: 0
+        }}
+      />
+      
+      {/* Overlay oscuro */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))',
+        zIndex: 1
+      }} />
+      
+      {/* Orbes */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 10
+      }}>
+        {featuredFilms.map((film, index) => (
+          <FilmOrb
             key={film.id}
-            onClick={() => onFilmSelect(film)}
-            className="bg-white/90 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform shadow-lg"
-          >
-            {film.image && (
-              <img
-                src={film.image}
-                alt={film.name}
-                className="w-full h-64 object-cover"
-              />
-            )}
-            <h3 className="text-center text-black text-sm font-semibold p-2">
-              {film.name}
-            </h3>
-          </div>
+            film={film}
+            position={POSITIONS[index]}
+            onClick={() => onFilmSelect ? onFilmSelect(film) : console.log(film.title)}
+          />
         ))}
       </div>
-    </div>
-  );
+      
+    </motion.div>
+  )
 }

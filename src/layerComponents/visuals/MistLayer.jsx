@@ -1,71 +1,57 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 
-export default function MistLayer({
-  layers = 3,
-  baseOpacity = 0.25,
-  blur = "blur-3xl",
-  direction = "x", // "x" | "y" | "diagonal"
-  theme = "forest", // "forest" | "aurora" | "calcifer"
-}) {
-  const arr = Array.from({ length: layers }, (_, i) => i);
-
-  // paletas según tema
-  const colorThemes = {
-    forest: {
-      from: "from-forest-light/20",
-      via: "via-forest-mid/25",
-      to: "to-transparent",
-    },
-    aurora: {
-      from: "from-aurora-blue/15",
-      via: "via-aurora-pink/20",
-      to: "to-transparent",
-    },
-    calcifer: {
-      from: "from-calcifer-core/20",
-      via: "via-calcifer-glow/25",
-      to: "to-transparent",
-    },
-  };
-
-  const { from, via, to } = colorThemes[theme] || colorThemes.forest;
-
+export default function MistLayer({ children }) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {arr.map((i) => {
-        const duration = 12 + i * 4;
-        const delay = i * 2;
-        const opacity = baseOpacity - i * 0.05;
+    <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      
+      {/* Neblina capa 1 - grande y lenta */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.15) 0%, transparent 50%)',
+          backdropFilter: 'blur(60px)'
+        }}
+        animate={{
+          x: [0, 50, 0],
+          y: [0, -30, 0],
+          scale: [1, 1.1, 1]
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+      />
+      
+      {/* Neblina capa 2 - media */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(circle at 70% 60%, rgba(200,200,255,0.1) 0%, transparent 40%)',
+          backdropFilter: 'blur(40px)'
+        }}
+        animate={{
+          x: [0, -40, 0],
+          y: [0, 20, 0],
+          scale: [1, 1.05, 1]
+        }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      />
+      
+      {/* Neblina capa 3 - pequeña y rápida */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(circle at 50% 30%, rgba(255,255,255,0.08) 0%, transparent 30%)',
+          backdropFilter: 'blur(20px)'
+        }}
+        animate={{
+          x: [0, 60, 0],
+          y: [0, -20, 0]
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
 
-        const move =
-          direction === "x"
-            ? { x: ["-10%", "10%", "-10%"], y: ["0%", "0%", "0%"] }
-            : direction === "y"
-            ? { y: ["-5%", "5%", "-5%"], x: ["0%", "0%", "0%"] }
-            : { x: ["-10%", "10%", "-10%"], y: ["-5%", "5%", "-5%"] };
-
-        return (
-          <motion.div
-            key={i}
-            className={`
-              absolute inset-0 ${blur}
-              bg-gradient-to-b ${from} ${via} ${to}
-              mix-blend-screen
-            `}
-            style={{ opacity }}
-            animate={{
-              ...move,
-              opacity: [0, opacity, 0],
-            }}
-            transition={{
-              duration,
-              delay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        );
-      })}
+      {/* Contenido encima de la neblina */}
+      <div className="relative z-10">
+        {children}
+      </div>
     </div>
-  );
+  )
 }
