@@ -1,6 +1,7 @@
+import { useNavigate } from 'react-router-dom'  // ← AGREGAR ESTO
+import { motion } from 'framer-motion'
 import useGhibliFilms from '../hooks/useGhibliFilms'
 import FilmOrb from '../layerComponents/visuals/FilmOrb'
-import { motion } from 'framer-motion'
 
 const FEATURED_FILMS = [
   'Spirited Away',
@@ -20,11 +21,9 @@ const POSITIONS = [
   { left: '50%', top: '80%', delay: 0.75 }
 ]
 
-export default function ForestScene({ films: propsFilms, loading: propsLoading, onFilmSelect }) {
-  const hookData = useGhibliFilms()
-  
-  const films = propsFilms || hookData.films
-  const loading = propsLoading !== undefined ? propsLoading : hookData.loading
+export default function ForestScene() {
+  const navigate = useNavigate()  
+  const { films, loading } = useGhibliFilms()
   
   if (loading) {
     return (
@@ -109,7 +108,7 @@ export default function ForestScene({ films: propsFilms, loading: propsLoading, 
             key={film.id}
             film={film}
             position={POSITIONS[index]}
-            onClick={() => onFilmSelect ? onFilmSelect(film) : console.log(film.title)}
+            onClick={() => navigate(`/film/${film.id}`)}  
           />
         ))}
       </div>

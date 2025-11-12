@@ -1,6 +1,29 @@
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 
 export default function FilmOrb({ film, position, onClick }) {
+  // Detectar tamaño de pantalla
+  const [orbSize, setOrbSize] = useState(180)
+  
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth < 640) {
+        setOrbSize(100)  
+      } else if (window.innerWidth < 768) {
+        setOrbSize(120)  
+      } else if (window.innerWidth < 1024) {
+        setOrbSize(140)  
+      } else {
+        setOrbSize(180)  
+      }
+    }
+    
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
+  
   return (
     <motion.div
       onClick={onClick}
@@ -9,17 +32,16 @@ export default function FilmOrb({ film, position, onClick }) {
         left: position.left,
         top: position.top,
         transform: 'translate(-50%, -50%)',
-        width: '180px',
-        height: '180px',
         zIndex: 20,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        width: `${orbSize}px`,       
+        height: `${orbSize}px`      
       }}
-      // Animación de entrada
       initial={{ opacity: 0, scale: 0.3, y: 100 }}
       animate={{ 
         opacity: 1, 
         scale: 1, 
-        y: [0, -10, 0]  // ← Entrada + respiración combinadas
+        y: [0, -10, 0]
       }}
       transition={{ 
         opacity: { duration: 0.8, delay: position.delay },
@@ -28,10 +50,9 @@ export default function FilmOrb({ film, position, onClick }) {
           duration: 3,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: position.delay + 0.8  // Empieza después de la entrada
+          delay: position.delay + 0.8
         }
       }}
-      // Hover
       whileHover={{ 
         scale: 1.15,
         transition: { duration: 0.3 }
@@ -51,7 +72,7 @@ export default function FilmOrb({ film, position, onClick }) {
           zIndex: -1
         }}
         animate={{
-          opacity: [0.4, 0.7, 0.4]  // Glow pulsante
+          opacity: [0.4, 0.7, 0.4]
         }}
         transition={{
           duration: 3,
@@ -64,14 +85,15 @@ export default function FilmOrb({ film, position, onClick }) {
       {/* Círculo con imagen */}
       <div
         style={{
-          width: '180px',
-          height: '180px',
+          position: 'relative',
+          width: `${orbSize}px`,      
+          height: `${orbSize}px`,      
           borderRadius: '50%',
           overflow: 'hidden',
           border: '5px solid rgba(255, 255, 255, 0.6)',
           boxShadow: '0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 255, 255, 0.2)',
-          position: 'relative',
-          backgroundColor: '#1a4d2e'
+          backgroundColor: '#1a4d2e',
+          zIndex: 1
         }}
       >
         <img 
@@ -81,11 +103,7 @@ export default function FilmOrb({ film, position, onClick }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            display: 'block',
-            imageRendering: 'high-quality'
-          }}
-          onError={(e) => {
-            e.target.style.display = 'none'
+            display: 'block'
           }}
         />
       </div>
@@ -96,23 +114,23 @@ export default function FilmOrb({ film, position, onClick }) {
         whileHover={{ opacity: 1, y: 0 }}
         style={{
           position: 'absolute',
-          top: '200px',
+          top: `${orbSize + 20}px`,  
           left: '50%',
           transform: 'translateX(-50%)',
           padding: '8px 16px',
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
           backdropFilter: 'blur(10px)',
           borderRadius: '8px',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          zIndex: 2
         }}
       >
         <p style={{
           color: 'white',
-          fontSize: '14px',
+          fontSize: orbSize > 140 ? '14px' : '12px',  
           fontWeight: '300',
-          letterSpacing: '0.5px',
           margin: 0
         }}>
           {film.title}

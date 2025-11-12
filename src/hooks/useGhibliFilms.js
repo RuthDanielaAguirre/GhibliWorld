@@ -53,7 +53,7 @@ export default function useGhibliFilms() {
         return res.json()
       })
       .then(data => {
-        console.log('Datos completos de la API:', data) // 🔍 Ver TODO lo que llega
+        console.log('Datos completos de la API:', data) 
         const normalized = data.map(normalizeFilm)
         setFilms(normalized)
         
