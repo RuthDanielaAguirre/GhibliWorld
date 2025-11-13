@@ -43,7 +43,7 @@ pnpm install
 pnpm dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at [Ghibli-World](https://ghibli-world-flax.vercel.app/)
 
 
 ## 📁 Project Structure
